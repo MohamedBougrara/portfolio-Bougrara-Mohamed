@@ -1,0 +1,54 @@
+WEBVTT
+
+00:00.000 --> 00:05.000
+Data import: the results folder
+is dragged and dropped into the app.
+
+00:05.000 --> 00:08.000
+Results tab: impact indicators (EF v3.1)
+for three battery scenarios: small, medium, large.
+
+00:08.000 --> 00:12.000
+The parameters of each scenario,
+grouped by activity.
+
+00:12.000 --> 00:15.500
+Total Scores tab: pick the functional unit,
+the scenarios and the indicators.
+
+00:15.500 --> 00:20.500
+Gather mode: the three scenarios as grouped bars.
+A second indicator is added.
+
+00:20.500 --> 00:23.000
+Split mode: one chart per indicator.
+
+00:23.000 --> 00:27.000
+Processes tab: the contribution of each process,
+as stacked bars.
+
+00:27.000 --> 00:33.000
+Set the maximum number of flows and the cut-off,
+then split the indicators.
+
+00:33.000 --> 00:36.000
+Upstream tab: the upstream supply chain
+as a sunburst chart.
+
+00:36.000 --> 00:39.000
+A click zooms into one link of the chain;
+hovering shows its value and share of the total.
+
+00:39.000 --> 00:44.000
+Substances tab: the contribution of each substance,
+including fossil carbon dioxide.
+
+00:44.000 --> 00:48.000
+Hovering over a bar shows its score.
+
+00:48.000 --> 00:50.000
+Split mode: one chart per indicator.
+
+00:50.000 --> 00:53.800
+Re-import data returns to the import screen:
+drop a results folder there.

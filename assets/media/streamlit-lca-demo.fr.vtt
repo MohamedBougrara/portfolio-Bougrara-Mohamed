@@ -1,0 +1,54 @@
+WEBVTT
+
+00:00.000 --> 00:05.000
+Import des données : on glisse-dépose
+le dossier de résultats dans l’application.
+
+00:05.000 --> 00:08.000
+Onglet Results : les indicateurs d’impact (EF v3.1)
+pour trois scénarios de batterie : petite, moyenne, grande.
+
+00:08.000 --> 00:12.000
+Les paramètres de chaque scénario,
+regroupés par activité.
+
+00:12.000 --> 00:15.500
+Onglet Total Scores : on choisit l’unité fonctionnelle,
+les scénarios et les indicateurs.
+
+00:15.500 --> 00:20.500
+Mode gather : les trois scénarios en barres groupées.
+On ajoute un second indicateur.
+
+00:20.500 --> 00:23.000
+Mode split : un graphique par indicateur.
+
+00:23.000 --> 00:27.000
+Onglet Processes : la contribution de chaque procédé,
+en barres empilées.
+
+00:27.000 --> 00:33.000
+On règle le nombre maximal de flux et le seuil de coupure,
+puis on sépare les indicateurs.
+
+00:33.000 --> 00:36.000
+Onglet Upstream : la chaîne amont
+en diagramme en soleil.
+
+00:36.000 --> 00:39.000
+Un clic zoome sur un maillon de la chaîne ;
+le survol donne sa valeur et sa part du total.
+
+00:39.000 --> 00:44.000
+Onglet Substances : la contribution de chaque substance,
+dont le dioxyde de carbone fossile.
+
+00:44.000 --> 00:48.000
+Le survol d’une barre affiche son score.
+
+00:48.000 --> 00:50.000
+Mode split : un graphique par indicateur.
+
+00:50.000 --> 00:53.800
+Re-import data ramène à l’écran d’import :
+on y glisse-dépose un dossier de résultats.

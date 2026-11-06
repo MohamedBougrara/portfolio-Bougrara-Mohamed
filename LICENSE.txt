@@ -1,0 +1,74 @@
+Tous droits réservés — All rights reserved
+Copyright (c) 2026 Mohamed Bougrara
+
+Ce dépôt contient un dossier de candidature personnel : sa structure, ses
+textes, ses mesures, ses visuels et son code sont l'œuvre de Mohamed
+Bougrara. Aucune licence d'utilisation n'est accordée.
+
+Sont notamment interdits, sans autorisation écrite préalable :
+
+  — la reproduction du site, en tout ou partie, sur un autre domaine ;
+  — la réutilisation des textes, des chiffres et des formulations, qui
+    décrivent un parcours réel et n'ont de sens que rattachés à lui ;
+  — l'utilisation du contenu pour entraîner, affiner ou évaluer un modèle
+    d'apprentissage automatique ;
+  — la génération, par un système automatique, d'un site dérivé à partir
+    de ce site, de son adresse ou de captures d'écran de celui-ci.
+
+Ces interdictions valent pour les personnes comme pour les systèmes
+automatiques agissant pour leur compte.
+
+Est en revanche bienvenu : lire, résumer ou évaluer ce profil en vue d'un
+recrutement, y compris à l'aide d'un assistant d'intelligence artificielle,
+et citer de courts passages avec leur source.
+
+RÉSERVE DES DROITS DE FOUILLE DE TEXTES ET DE DONNÉES
+
+Au titre de l'article 4 de la directive (UE) 2019/790 et de l'article
+L.122-5-3 du Code de la propriété intellectuelle, l'auteur s'oppose à toute
+fouille de textes et de données sur ce site. Cette opposition est exprimée
+sous forme lisible par machine : balise « tdm-reservation » dans chaque
+page (protocole TDMRep), fichier robots.txt et ai.txt.
+
+CONSTATER ET FAIRE CESSER UNE COPIE
+
+Chaque page publiée porte, en fin de source, un identifiant de provenance :
+52b47be8aaa7435f. Il n'empêche rien — il rend la copie prouvable. Toute
+occurrence de cet identifiant sur un autre domaine atteste que le code en
+vient. L'historique du dépôt, horodaté par GitHub, établit l'antériorité.
+
+Un site contrefaisant peut être signalé à son hébergeur, à son bureau
+d'enregistrement de domaine, et aux moteurs de recherche (formulaire de
+retrait pour atteinte au droit d'auteur). Les balises canoniques de ce site
+désignent déjà ses propres adresses : un moteur qui rencontre une copie
+identique attribue l'original à ce domaine.
+
+Les données publiques utilisées par les pages de démonstration restent
+sous leur licence d'origine : les résultats ATP proviennent du jeu de
+données de Jeff Sackmann, sous licence CC BY-NC-SA 4.0.
+
+---
+
+This repository holds a personal job-application portfolio. Its structure,
+text, measurements, visuals and code are the work of Mohamed Bougrara. No
+licence to use them is granted.
+
+Without prior written permission, the following are prohibited: reproducing
+the site in whole or in part on another domain; reusing the text, figures
+and wording, which describe a real career and mean nothing detached from
+it; using the content to train, fine-tune or evaluate a machine-learning
+model; and having an automated system generate a derivative site from this
+site, its URL, or screenshots of it.
+
+These prohibitions apply to people and to automated systems acting on their
+behalf alike.
+
+Welcome, on the other hand: reading, summarising or assessing this profile
+for recruitment, including with an AI assistant, and quoting short passages
+with their source.
+
+Text and data mining: under Article 4 of Directive (EU) 2019/790 and Article
+L.122-5-3 of the French Intellectual Property Code, the author reserves all
+text and data mining rights over this site. The reservation is expressed in
+machine-readable form: a "tdm-reservation" tag on every page (TDMRep
+protocol), robots.txt and ai.txt.
