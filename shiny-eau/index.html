@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; worker-src 'self' blob:; child-src 'self' blob:; frame-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' blob: data:; object-src 'none'; base-uri 'self'; form-action 'self'">
+    <meta name="author" content="Mohamed Bougrara">
+    <meta name="description" content="R Shiny app: safe drinking water in 235 countries and territories, 2000-2024 (WHO/UNICEF JMP).">
+    <meta name="robots" content="noai, noimageai">
+    <meta name="rights" content="&copy; Mohamed Bougrara. All rights reserved.">
+    <link rel="icon" href="../favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Safe drinking water, country by country · Mohamed Bougrara</title>
+    <script
+      src="./shinylive/load-shinylive-sw.js"
+      type="module"
+    ></script>
+    <script type="module">
+      import { runExportedApp } from "./shinylive/shinylive.js";
+      runExportedApp({
+        id: "root",
+        appEngine: "r",
+        relPath: "",
+      });
+    </script>
+    <link rel="stylesheet" href="./shinylive/style-resets.css" />
+    <link rel="stylesheet" href="./shinylive/shinylive.css" />
+    
+  </head>
+  <body>
+    
+    <div style="height: 100vh; width: 100vw" id="root"></div>
+    
+  </body>
+</html>
