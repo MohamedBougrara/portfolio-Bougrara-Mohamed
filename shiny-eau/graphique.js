@@ -26,14 +26,39 @@
     return $(scope).find(".graphique-output");
   };
 
+  // Phones: legends and colour scales go under the chart, so that the plot
+  // keeps the full width of the screen.
+  var ETROIT = 576;
+  function etroit(el) { return el.clientWidth > 0 && el.clientWidth < ETROIT; }
+  function adapter(fig, petit) {
+    if (!petit) return { data: fig.data, layout: fig.layout };
+    var layout = Object.assign({}, fig.layout, {
+      legend: Object.assign({}, fig.layout.legend, { orientation: "h", x: 0, xanchor: "left", y: -0.12, yanchor: "top" }),
+      margin: Object.assign({}, fig.layout.margin, { r: 8 })
+    });
+    var data = fig.data.map(function (t) {
+      if (!t.colorbar) return t;
+      return Object.assign({}, t, { colorbar: Object.assign({}, t.colorbar,
+        { orientation: "h", x: 0.5, xanchor: "center", y: 0, yanchor: "top", len: 0.9, thickness: 10 }) });
+    });
+    return { data: data, layout: layout };
+  }
+  function dessiner(el) {
+    var fig = el._figure, petit = etroit(el), f = adapter(fig, petit);
+    el._petit = petit;
+    // No toolbar: the axes are fixed, and on a touch screen it covers the chart.
+    var config = Object.assign({ responsive: true, displaylogo: false, displayModeBar: false,
+      topojsonURL: STATIQUE + "topojson/" }, fig.config || {});
+    return Plotly.react(el, f.data, f.layout, config);
+  }
+
   binding.renderValue = function (el, fig) {
     if (!fig) { Plotly.purge(el); return; }
-    var config = Object.assign({ responsive: true, displaylogo: false,
-      topojsonURL: STATIQUE + "topojson/" }, fig.config || {});
     var aGeo = fig.data.some(function (t) { return t.geojson === "monde"; });
     (aGeo ? chargerMonde() : Promise.resolve(null)).then(function (geo) {
       if (geo) fig.data.forEach(function (t) { if (t.geojson === "monde") t.geojson = geo; });
-      return Plotly.react(el, fig.data, fig.layout, config);
+      el._figure = fig;
+      return dessiner(el);
     }).then(function () {
       if (el._clicEcoute) return;
       el._clicEcoute = true;
@@ -58,8 +83,12 @@
 
   // Charts inside cards that change size (sidebar, full screen) follow.
   // (the script loads in <head>: wait for the page before observing it).
+  // Crossing the phone width redraws the chart with the other layout.
   function redimensionner() {
-    document.querySelectorAll(".graphique-output").forEach(function (g) { if (g.data) Plotly.Plots.resize(g); });
+    document.querySelectorAll(".graphique-output").forEach(function (g) {
+      if (!g.data || !g._figure) return;
+      if (etroit(g) !== g._petit) dessiner(g); else Plotly.Plots.resize(g);
+    });
   }
   document.addEventListener("DOMContentLoaded", function () {
     if (window.ResizeObserver) new ResizeObserver(redimensionner).observe(document.body);
