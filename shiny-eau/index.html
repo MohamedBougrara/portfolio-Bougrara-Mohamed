@@ -57,6 +57,80 @@
     
   </head>
   <body>
+    <!-- Loading screen (publier.R inserts this file into the page that hosts
+         the app). It follows what really happens: R starts in the browser,
+         then the app draws its page; it leaves when the app is on screen. -->
+    <style>
+      #chargement { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 24px;
+        background: #f8fafc; color: #1e293b; font: 16px/1.5 "Source Sans 3", "Segoe UI", Roboto, Arial, sans-serif;
+        transition: opacity .3s ease; }
+      #chargement.fini { opacity: 0; pointer-events: none; }
+      #chargement .boite { width: min(26rem, 100%); }
+      #chargement h1 { margin: 0 0 4px; font-size: 1.375rem; line-height: 1.25; font-weight: 700; }
+      #chargement p { margin: 0; color: #5C6A80; }
+      #chargement ol { list-style: none; margin: 20px 0 0; padding: 0; }
+      #chargement li { display: flex; align-items: center; gap: 10px; padding: 6px 0; color: #5C6A80; }
+      #chargement li::before { content: ""; flex: none; width: 14px; height: 14px; border-radius: 50%;
+        border: 2px solid #D7DEE7; box-sizing: border-box; }
+      #chargement li.en-cours { color: #1e293b; font-weight: 600; }
+      #chargement li.en-cours::before { border-color: #295489; border-top-color: transparent; animation: tourne .8s linear infinite; }
+      #chargement li.fait::before { border-color: #295489; background: #295489; }
+      #chargement .duree { margin-top: 16px; font-size: .875rem; font-variant-numeric: tabular-nums; }
+      @keyframes tourne { to { transform: rotate(360deg); } }
+      @media (prefers-reduced-motion: reduce) { #chargement li.en-cours::before { animation: none; border-top-color: #295489; } #chargement { transition: none; } }
+    </style>
+    <div id="chargement" role="status" aria-live="polite">
+      <div class="boite">
+        <h1 data-t="titre">Safe drinking water, country by country</h1>
+        <p data-t="sous">An R Shiny app that runs in your browser. Nothing is installed on your device.</p>
+        <ol>
+          <li id="etapeR" class="en-cours" data-t="r">Starting R in your browser</li>
+          <li id="etapePage" data-t="page">Drawing the app</li>
+        </ol>
+        <p class="duree"><span id="chargementDuree">0</span> s</p>
+      </div>
+    </div>
+    <script>
+    (function () {
+      var FR = { titre: "L'eau potable, pays par pays",
+        sous: "Une application R Shiny qui tourne dans votre navigateur. Rien ne s'installe sur votre appareil.",
+        r: "Démarrage de R dans votre navigateur", page: "Affichage de l'application" };
+      var ecran = document.getElementById("chargement");
+      if (/[?&]lang=fr\b/.test(location.search)) {
+        document.documentElement.lang = "fr";
+        ecran.querySelectorAll("[data-t]").forEach(function (e) { e.textContent = FR[e.getAttribute("data-t")]; });
+      }
+      var debut = Date.now(), duree = document.getElementById("chargementDuree");
+      var horloge = setInterval(function () { duree.textContent = Math.round((Date.now() - debut) / 1000); }, 1000);
+      var etapeR = document.getElementById("etapeR"), etapePage = document.getElementById("etapePage");
+      function fini() {
+        clearInterval(horloge); observateur.disconnect();
+        etapePage.className = "fait"; ecran.classList.add("fini");
+        setTimeout(function () { ecran.remove(); }, 400);
+      }
+      // shinylive gives the app's frame its address once R has started the
+      // app; the frame then loads the page the app serves.
+      function suivre(cadre) {
+        if (cadre._suivi) return; cadre._suivi = true;
+        cadre.addEventListener("load", function () {
+          if (!/app_/.test(cadre.getAttribute("src") || "")) return;
+          etapeR.className = "fait"; etapePage.className = "en-cours";
+          // On screen once the app has drawn its navbar.
+          var essais = 0, attente = setInterval(function () {
+            var doc = null; try { doc = cadre.contentDocument; } catch (e) {}
+            if ((doc && doc.querySelector(".navbar")) || ++essais > 100) { clearInterval(attente); fini(); }
+          }, 100);
+        });
+      }
+      var observateur = new MutationObserver(function () {
+        var cadre = document.querySelector("iframe");
+        if (!cadre) return;
+        if (/app_/.test(cadre.getAttribute("src") || "")) { etapeR.className = "fait"; etapePage.className = "en-cours"; }
+        suivre(cadre);
+      });
+      observateur.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["src"] });
+    })();
+    </script>
     
     <div style="height: 100vh; width: 100vw" id="root"></div>
     

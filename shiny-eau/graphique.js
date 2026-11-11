@@ -95,13 +95,35 @@
   });
   document.addEventListener("shown.bs.tab", redimensionner);
 
-  // Language asked by the page that opens the app (?lang=fr). Under
-  // shinylive the app runs in a frame of that page, on the same origin.
+  // The address of the page that opens the app: ?lang=fr&tab=country&country=SEN.
+  // Under shinylive the app runs in a frame of that page, on the same origin.
+  function pageHote() {
+    try { if (window.parent !== window && window.parent.location.href) return window.parent; } catch (e) {}
+    return window;
+  }
   $(document).on("shiny:connected", function () {
-    var adresse = window.location.search;
-    try { if (window.parent !== window) adresse = window.parent.location.search || adresse; } catch (e) {}
-    var m = /[?&]lang=(fr|en)\b/.exec(adresse);
-    if (m) Shiny.setInputValue("lang_url", m[1]);
+    var p = new URLSearchParams(pageHote().location.search);
+    if (/^(fr|en)$/.test(p.get("lang") || "")) Shiny.setInputValue("lang_url", p.get("lang"));
+    if (p.get("tab") || p.get("country")) {
+      Shiny.setInputValue("adresse", { onglet: p.get("tab") || "country",
+        pays: /^[A-Z]{3}$/.test(p.get("country") || "") ? p.get("country") : null });
+    }
+  });
+  // The server names the tab and the country shown: the address follows,
+  // without a new history entry, so that the link can be copied and shared.
+  Shiny.addCustomMessageHandler("adresse", function (m) {
+    var hote = pageHote(), p = new URLSearchParams();
+    p.set("lang", m.lang);
+    if (m.tab !== "map") p.set("tab", m.tab);
+    if (m.country) p.set("country", m.country);
+    try { hote.history.replaceState(null, "", hote.location.pathname + "?" + p.toString()); } catch (e) {}
+  });
+
+  // Buttons drawn by the server inside tables (a country, a column header):
+  // a click sends their value to the Shiny input they name.
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest("button[data-input][data-valeur]");
+    if (b) Shiny.setInputValue(b.getAttribute("data-input"), b.getAttribute("data-valeur"), { priority: "event" });
   });
 
   // Relabels a download button when the language changes.
