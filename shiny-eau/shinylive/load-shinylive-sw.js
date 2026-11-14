@@ -37,7 +37,7 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register(serviceWorkerPath, { type: "module" }).then((registration) => registration.update()).then(() => console.log("Service Worker registered")).catch(() => console.log("Service Worker registration failed"));
   navigator.serviceWorker.ready.then(() => {
     if (!navigator.serviceWorker.controller) {
-      window.location.reload();
+      setTimeout(() => { if (!navigator.serviceWorker.controller) window.location.reload(); }, 1500);
     }
   });
 }

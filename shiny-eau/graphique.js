@@ -114,10 +114,15 @@
   Shiny.addCustomMessageHandler("adresse", function (m) {
     var hote = pageHote(), p = new URLSearchParams();
     p.set("lang", m.lang);
+    // The language of the page, for screen readers and the CSS labels.
+    document.documentElement.lang = m.lang;
     if (m.tab !== "map") p.set("tab", m.tab);
     if (m.country) p.set("country", m.country);
     try { hote.history.replaceState(null, "", hote.location.pathname + "?" + p.toString()); } catch (e) {}
   });
+
+  // Phones, where the page scrolls: a new tab opens at its top.
+  document.addEventListener("shown.bs.tab", function () { if (window.scrollY > 0) window.scrollTo(0, 0); });
 
   // Buttons drawn by the server inside tables (a country, a column header):
   // a click sends their value to the Shiny input they name.

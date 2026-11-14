@@ -33338,21 +33338,7 @@ webr::shim_install()
 }
 
 .start_app <- function(appName, appDir, devMode = FALSE) {
-  # Mount VFS images provided in Shinylive app assets
-  .mount_vfs_images()
-
-  # Uniquely install packages with webr
-  unique_pkgs <- unique(renv::dependencies(appDir, quiet = TRUE)$Package)
-  lapply(unique_pkgs, function(pkg_name) {
-    if (isTRUE(.webr_pkg_cache[[pkg_name]])) return()
-
-    has_pkg <- nzchar(system.file(package = pkg_name))
-    .webr_pkg_cache[[pkg_name]] <<- has_pkg
-
-    if (!has_pkg) {
-      webr::install(pkg_name)
-    }
-  })
+  # The packages of this app are all in the library image (publier.R).
 
   if (isTRUE(devMode)) {
     # Enable client-side dev mode features, namely the error console
