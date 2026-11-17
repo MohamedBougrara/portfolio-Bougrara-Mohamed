@@ -1,0 +1,258 @@
+{
+ "view": {
+  "name": "star.v_victim_metro",
+  "sql": "SELECT f.*, d.year, d.month, d.weekday, d.is_weekend\nFROM star.fact_victim f\nJOIN star.dim_date       d  ON d.date_key = f.date_key\nJOIN star.dim_department dd ON dd.dep = f.dep\nWHERE dd.is_metropolitan"
+ },
+ "tables": [
+  {
+   "table": "star.dim_date",
+   "file": "data/star.dim_date.parquet",
+   "rows": 2192,
+   "bytes": 4868,
+   "columns": [
+    {
+     "name": "date_key",
+     "type": "INTEGER"
+    },
+    {
+     "name": "full_date",
+     "type": "DATE"
+    },
+    {
+     "name": "year",
+     "type": "SMALLINT"
+    },
+    {
+     "name": "month",
+     "type": "SMALLINT"
+    },
+    {
+     "name": "weekday",
+     "type": "SMALLINT"
+    },
+    {
+     "name": "is_weekend",
+     "type": "BOOLEAN"
+    }
+   ]
+  },
+  {
+   "table": "star.dim_mode",
+   "file": "data/star.dim_mode.parquet",
+   "rows": 8,
+   "bytes": 919,
+   "columns": [
+    {
+     "name": "mode_key",
+     "type": "SMALLINT"
+    },
+    {
+     "name": "mode_label",
+     "type": "VARCHAR"
+    },
+    {
+     "name": "catv_codes",
+     "type": "VARCHAR"
+    }
+   ]
+  },
+  {
+   "table": "star.dim_light",
+   "file": "data/star.dim_light.parquet",
+   "rows": 6,
+   "bytes": 614,
+   "columns": [
+    {
+     "name": "light_key",
+     "type": "SMALLINT"
+    },
+    {
+     "name": "light_label",
+     "type": "VARCHAR"
+    },
+    {
+     "name": "is_night",
+     "type": "BOOLEAN"
+    }
+   ]
+  },
+  {
+   "table": "star.dim_road",
+   "file": "data/star.dim_road.parquet",
+   "rows": 9,
+   "bytes": 519,
+   "columns": [
+    {
+     "name": "road_key",
+     "type": "SMALLINT"
+    },
+    {
+     "name": "road_label",
+     "type": "VARCHAR"
+    }
+   ]
+  },
+  {
+   "table": "star.dim_department",
+   "file": "data/star.dim_department.parquet",
+   "rows": 107,
+   "bytes": 1902,
+   "columns": [
+    {
+     "name": "dep",
+     "type": "VARCHAR"
+    },
+    {
+     "name": "dep_name",
+     "type": "VARCHAR"
+    },
+    {
+     "name": "region_name",
+     "type": "VARCHAR"
+    },
+    {
+     "name": "is_metropolitan",
+     "type": "BOOLEAN"
+    }
+   ]
+  },
+  {
+   "table": "star.fact_victim",
+   "file": "data/star.fact_victim.parquet",
+   "rows": 745158,
+   "bytes": 4449792,
+   "columns": [
+    {
+     "name": "person_id",
+     "type": "INTEGER"
+    },
+    {
+     "name": "num_acc",
+     "type": "BIGINT"
+    },
+    {
+     "name": "date_key",
+     "type": "INTEGER"
+    },
+    {
+     "name": "hour",
+     "type": "SMALLINT"
+    },
+    {
+     "name": "dep",
+     "type": "VARCHAR"
+    },
+    {
+     "name": "light_key",
+     "type": "INTEGER"
+    },
+    {
+     "name": "road_key",
+     "type": "INTEGER"
+    },
+    {
+     "name": "mode_key",
+     "type": "SMALLINT"
+    },
+    {
+     "name": "vehicle_category",
+     "type": "SMALLINT"
+    },
+    {
+     "name": "in_built_up_area",
+     "type": "BOOLEAN"
+    },
+    {
+     "name": "role",
+     "type": "SMALLINT"
+    },
+    {
+     "name": "sex",
+     "type": "SMALLINT"
+    },
+    {
+     "name": "age",
+     "type": "SMALLINT"
+    },
+    {
+     "name": "severity",
+     "type": "SMALLINT"
+    },
+    {
+     "name": "killed",
+     "type": "INTEGER"
+    },
+    {
+     "name": "hospitalised",
+     "type": "INTEGER"
+    },
+    {
+     "name": "slightly_injured",
+     "type": "INTEGER"
+    },
+    {
+     "name": "victim",
+     "type": "INTEGER"
+    }
+   ]
+  },
+  {
+   "table": "clean.person",
+   "file": "data/clean.person.parquet",
+   "rows": 745158,
+   "bytes": 998780,
+   "columns": [
+    {
+     "name": "person_id",
+     "type": "INTEGER"
+    },
+    {
+     "name": "secu1",
+     "type": "SMALLINT"
+    },
+    {
+     "name": "secu2",
+     "type": "SMALLINT"
+    },
+    {
+     "name": "secu3",
+     "type": "SMALLINT"
+    }
+   ]
+  }
+ ],
+ "questions": [
+  {
+   "id": "q1_deaths_by_year",
+   "sql": "WITH yearly AS (\n    SELECT year,\n           sum(killed) AS killed,\n           sum(victim) AS victims\n    FROM star.v_victim_metro\n    GROUP BY year\n)\nSELECT\n    year,\n    killed,\n    killed - lag(killed) OVER w                                      AS change,\n    round(100.0 * (killed - lag(killed) OVER w) / lag(killed) OVER w, 1) AS change_pct,\n    round(100.0 * killed / first_value(killed) OVER w, 1)            AS index_2019,\n    victims,\n    round(100.0 * killed / victims, 2)                               AS lethality\nFROM yearly\nWINDOW w AS (ORDER BY year)\nORDER BY year"
+  },
+  {
+   "id": "q2_by_mode",
+   "sql": "SELECT\n    m.mode_label                                                     AS mode,\n    count(*)                                                         AS involved,\n    sum(f.victim)                                                    AS victims,\n    sum(f.killed)                                                    AS killed,\n    round(100.0 * count(*)      / sum(count(*))      OVER (), 1)     AS share_involved_pct,\n    round(100.0 * sum(f.killed) / sum(sum(f.killed)) OVER (), 1)     AS share_killed_pct,\n    round(100.0 * sum(f.killed) / nullif(sum(f.victim), 0), 2)       AS lethality\nFROM star.v_victim_metro f\nJOIN star.dim_mode m ON m.mode_key = f.mode_key\nGROUP BY m.mode_key, m.mode_label\nORDER BY killed DESC"
+  },
+  {
+   "id": "q3_built_up_area",
+   "sql": "SELECT\n    CASE WHEN in_built_up_area THEN 'En agglomération'\n         ELSE 'Hors agglomération' END                               AS area,\n    count(DISTINCT num_acc)                                          AS accidents,\n    round(100.0 * count(DISTINCT num_acc)\n                / sum(count(DISTINCT num_acc)) OVER (), 1)           AS accidents_share_pct,\n    sum(killed)                                                      AS killed,\n    round(100.0 * sum(killed) / sum(sum(killed)) OVER (), 1)         AS killed_share_pct,\n    round(100.0 * sum(killed) / count(DISTINCT num_acc), 2)          AS killed_per_100_accidents,\n    round(100.0 * sum(killed) / sum(victim), 2)                      AS lethality\nFROM star.v_victim_metro\nGROUP BY in_built_up_area"
+  },
+  {
+   "id": "q4_departments",
+   "sql": "WITH per_dep AS (\n    SELECT f.dep, d.dep_name, d.region_name,\n           sum(f.victim) AS victims,\n           sum(f.killed) AS killed,\n           round(100.0 * sum(f.killed) / sum(f.victim), 2) AS lethality\n    FROM star.v_victim_metro f\n    JOIN star.dim_department d ON d.dep = f.dep\n    GROUP BY f.dep, d.dep_name, d.region_name\n)\nSELECT *,\n       victims < 1000                          AS small_sample,  -- under ~170 victims a year\n       rank()   OVER (ORDER BY lethality DESC) AS rank,\n       ntile(4) OVER (ORDER BY lethality DESC, dep) AS quartile,\n       count(*) OVER ()                        AS departments_ranked\nFROM per_dep\nORDER BY rank, dep"
+  },
+  {
+   "id": "q5_hour_weekday",
+   "sql": "SELECT\n    hour,\n    sum(killed) FILTER (WHERE weekday = 1) AS mon,\n    sum(killed) FILTER (WHERE weekday = 2) AS tue,\n    sum(killed) FILTER (WHERE weekday = 3) AS wed,\n    sum(killed) FILTER (WHERE weekday = 4) AS thu,\n    sum(killed) FILTER (WHERE weekday = 5) AS fri,\n    sum(killed) FILTER (WHERE weekday = 6) AS sat,\n    sum(killed) FILTER (WHERE weekday = 7) AS sun,\n    sum(killed)                            AS killed,\n    sum(victim)                            AS victims,\n    round(100.0 * sum(killed) / sum(victim), 2) AS lethality\nFROM star.v_victim_metro\nGROUP BY hour\nORDER BY hour"
+  },
+  {
+   "id": "q5b_light",
+   "sql": "SELECT\n    l.light_label                                   AS light,\n    sum(f.victim)                                   AS victims,\n    sum(f.killed)                                   AS killed,\n    round(100.0 * sum(f.killed) / nullif(sum(f.victim), 0), 2) AS lethality\nFROM star.v_victim_metro f\nJOIN star.dim_light l ON l.light_key = f.light_key\nWHERE l.light_key <> 0                -- 8 victims with unknown lighting\nGROUP BY l.light_key, l.light_label\nORDER BY l.light_key"
+  },
+  {
+   "id": "q6_escooters",
+   "sql": "WITH yearly AS (\n    SELECT year,\n           sum(victim)       FILTER (WHERE vehicle_category = 50)       AS escooter_victims,\n           sum(killed)       FILTER (WHERE vehicle_category = 50)       AS escooter_killed,\n           sum(hospitalised) FILTER (WHERE vehicle_category = 50)       AS escooter_hospitalised,\n           percentile_cont(0.5) WITHIN GROUP (ORDER BY age)\n                 FILTER (WHERE vehicle_category = 50 AND victim = 1)    AS escooter_median_age,\n           sum(victim)       FILTER (WHERE vehicle_category IN (1, 80)) AS bicycle_victims\n    FROM star.v_victim_metro\n    WHERE role <> 3\n    GROUP BY year\n)\nSELECT\n    year,\n    escooter_victims,\n    round(100.0 * (escooter_victims - lag(escooter_victims) OVER w)\n                / lag(escooter_victims) OVER w, 1)                AS victims_change_pct,\n    escooter_hospitalised,\n    escooter_killed,\n    sum(escooter_killed) OVER w                                   AS killed_running_total,\n    escooter_median_age,\n    bicycle_victims,\n    round(100.0 * escooter_victims / bicycle_victims, 1)          AS escooter_per_100_bicycle\nFROM yearly\nWINDOW w AS (ORDER BY year)\nORDER BY year"
+  },
+  {
+   "id": "q7_seat_belt",
+   "sql": "WITH car_occupants AS (\n    SELECT f.killed,\n           CASE WHEN 1 IN (p.secu1, p.secu2, p.secu3) THEN 'Ceinture attachée'\n                WHEN p.secu1 = 0                      THEN 'Aucun équipement'\n                WHEN p.secu1 = 8                      THEN 'Non déterminable'\n                ELSE 'Autre ou non renseigné' END AS equipment\n    FROM star.v_victim_metro f\n    JOIN clean.person p ON p.person_id = f.person_id\n    WHERE f.mode_key = 5          -- car\n      AND f.role IN (1, 2)        -- driver or passenger\n)\nSELECT\n    equipment,\n    count(*)                                                    AS involved,\n    sum(killed)                                                 AS killed,\n    round(100.0 * sum(killed) / count(*), 2)                    AS killed_per_100_involved,\n    round(100.0 * count(*)    / sum(count(*))    OVER (), 1)    AS share_involved_pct,\n    round(100.0 * sum(killed) / sum(sum(killed)) OVER (), 1)    AS share_killed_pct\nFROM car_occupants\nGROUP BY equipment\nORDER BY involved DESC"
+  }
+ ]
+}

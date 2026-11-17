@@ -1,0 +1,187 @@
+/* console.css
+   The SQL console, in the colours and fonts of the portfolio.
+   Order: tokens, page, header, loading, layout, side column, editor,
+   result, chart, footer, small screens. */
+
+@font-face {
+    font-family: 'Source Sans 3'; font-style: normal; font-weight: 300 800; font-display: swap;
+    src: url('../assets/fonts/source-sans-3-latin.woff2') format('woff2');
+}
+
+:root {
+    --fond: #f8fafc; --carte: #ffffff; --texte: #1e293b; --discret: #5C6A80; --filet: #D7DEE7;
+    --accent: #295489; --accent-fond: rgba(41, 84, 137, .10); --bouton: #295489; --bouton-texte: #ffffff;
+    --alerte: #9f2936; --alerte-fond: #fdf1f2; --code-fond: #fbfcfe; --barre: #295489; --barre-fond: #e8edf3;
+    --mot: #295489; --chaine: #2f7d5b; --nombre: #9a5b13; --commentaire: #6b7789;
+    --mono: ui-monospace, "SFMono-Regular", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --rayon: 8px;
+}
+:root[data-theme="dark"] {
+    --fond: #0b1120; --carte: #151e32; --texte: #e2e8f0; --discret: #a8b3c4; --filet: #2F3D55;
+    --accent: #7DA4D4; --accent-fond: rgba(125, 164, 212, .16); --bouton: #23518B; --bouton-texte: #ffffff;
+    --alerte: #f19ca3; --alerte-fond: #2a1a22; --code-fond: #101829; --barre: #7DA4D4; --barre-fond: #223049;
+    --mot: #8fb6e8; --chaine: #7fcfa8; --nombre: #e6b877; --commentaire: #8b98ad;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { color-scheme: light; }
+html[data-theme="dark"] { color-scheme: dark; }
+body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; background: var(--fond); color: var(--texte);
+       font: 16px/1.5 'Source Sans 3', "Segoe UI", Roboto, Arial, sans-serif; }
+h1, h2, p, ol, ul { margin: 0; }
+ol, ul { padding: 0; list-style: none; }
+a { color: var(--accent); }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ----- Header ----- */
+.tete { display: flex; align-items: center; gap: 20px; padding: 12px 24px; background: var(--carte);
+        border-bottom: 1px solid var(--filet); }
+.retour { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-weight: 600;
+          text-decoration: none; white-space: nowrap; }
+.retour:hover { text-decoration: underline; }
+.titres { flex: 1; min-width: 0; }
+.titres h1 { font-size: 1.25rem; line-height: 1.25; font-weight: 700; }
+.titres p { color: var(--discret); font-size: .95rem; }
+.reglages { flex: none; display: flex; align-items: center; gap: 8px; }
+.langues { display: flex; border: 1px solid var(--filet); border-radius: var(--rayon); overflow: hidden; }
+.langues a { min-width: 44px; min-height: 40px; display: grid; place-items: center; font-weight: 600; font-size: .9rem;
+             text-decoration: none; color: var(--discret); }
+.langues a[aria-current="true"] { background: var(--accent-fond); color: var(--accent); }
+.bouton-icone { width: 44px; height: 40px; display: grid; place-items: center; border: 1px solid var(--filet);
+                border-radius: var(--rayon); background: none; color: var(--discret); cursor: pointer; }
+.bouton-icone:hover { color: var(--accent); border-color: var(--accent); }
+
+/* ----- Loading and failure ----- */
+main { flex: 1; width: 100%; max-width: 1500px; margin: 0 auto; padding: 24px; }
+.chargement, .panne { max-width: 32rem; margin: 12vh auto 0; padding: 28px; background: var(--carte);
+                      border: 1px solid var(--filet); border-radius: var(--rayon); }
+.chargement h2, .panne h2 { font-size: 1.25rem; margin-bottom: 6px; }
+.chargement p, .panne p { color: var(--discret); }
+.jauge { height: 8px; margin: 20px 0 10px; border-radius: 4px; background: var(--barre-fond); overflow: hidden; }
+.jauge i { display: block; height: 100%; width: 0; border-radius: 4px; background: var(--barre); transition: width .2s ease; }
+.etape { font-size: .9rem; font-variant-numeric: tabular-nums; min-height: 1.4em; }
+.panne p + p { margin-top: 10px; }
+
+/* ----- Layout: side column, work area ----- */
+.console { display: grid; grid-template-columns: 20rem minmax(0, 1fr); gap: 24px; align-items: start; }
+/* minmax(0, 1fr): a wide table scrolls inside its box instead of widening the page. */
+.cote { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+.travail { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+h2 { font-size: .8rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--discret); }
+.aide { margin-top: 4px; font-size: .9rem; color: var(--discret); }
+
+/* ----- Side column: questions, starters, tables ----- */
+.questions, .essais { margin-top: 10px; display: grid; gap: 6px; }
+.questions button, .essais button { width: 100%; display: grid; grid-template-columns: 1.6rem 1fr; column-gap: 8px;
+    align-items: baseline; padding: 9px 12px; min-height: 44px; text-align: left; font: inherit; color: inherit;
+    background: var(--carte); border: 1px solid var(--filet); border-radius: var(--rayon); cursor: pointer; }
+.essais button { grid-template-columns: 1fr; }
+.questions button:hover, .essais button:hover { border-color: var(--accent); }
+.questions button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-fond); }
+.questions button[aria-pressed="true"] .q-tech { color: var(--texte); }
+.q-num { font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+.q-titre { font-weight: 600; line-height: 1.3; }
+.q-tech { grid-column: 2; margin-top: 2px; font: .78rem/1.4 var(--mono); color: var(--discret); }
+#tables { margin-top: 10px; display: grid; gap: 6px; }
+#tables details { background: var(--carte); border: 1px solid var(--filet); border-radius: var(--rayon); }
+#tables summary { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 9px 12px;
+                  min-height: 44px; cursor: pointer; font: 600 .85rem/1.5 var(--mono); }
+#tables summary small { flex: none; font: .8rem/1.5 'Source Sans 3', sans-serif; color: var(--discret);
+                        font-variant-numeric: tabular-nums; }
+.t-note { padding: 0 12px 8px; font-size: .88rem; color: var(--discret); }
+.colonnes { padding: 0 6px 8px; display: grid; }
+.colonnes button { display: flex; justify-content: space-between; gap: 12px; padding: 4px 6px; border: 0; border-radius: 4px;
+                   background: none; color: inherit; font: .82rem/1.5 var(--mono); text-align: left; cursor: pointer; }
+.colonnes button:hover { background: var(--accent-fond); }
+.colonnes button span:last-child { color: var(--discret); font-size: .75rem; }
+
+/* ----- The question on screen ----- */
+.question-active { padding: 14px 16px; background: var(--accent-fond); border-left: 3px solid var(--accent);
+                   border-radius: 0 var(--rayon) var(--rayon) 0; }
+.qa-titre { font-weight: 700; font-size: 1.1rem; line-height: 1.3; }
+.qa-constat { margin-top: 4px; max-width: 70ch; }
+
+/* ----- Editor ----- */
+.editeur, .resultat { background: var(--carte); border: 1px solid var(--filet); border-radius: var(--rayon); }
+.editeur-tete, .resultat-tete { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+                                padding: 10px 16px; border-bottom: 1px solid var(--filet); min-height: 48px; }
+.raccourci { font-size: .85rem; color: var(--discret); }
+.zone { position: relative; height: 19rem; background: var(--code-fond); }
+#reflet, #sql { position: absolute; inset: 0; margin: 0; padding: 14px 16px; border: 0; overflow: auto;
+                font: .875rem/1.6 var(--mono); tab-size: 4; white-space: pre; letter-spacing: 0; }
+#reflet { color: var(--texte); pointer-events: none; }
+#sql { resize: none; background: transparent; color: transparent; caret-color: var(--texte); outline-offset: -2px; }
+#sql::selection { background: var(--accent-fond); }
+.mot { color: var(--mot); font-weight: 600; }
+.chaine { color: var(--chaine); }
+.nombre { color: var(--nombre); }
+.commentaire { color: var(--commentaire); font-style: italic; }
+.barre { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; padding: 10px 16px;
+         border-top: 1px solid var(--filet); }
+.bouton { min-height: 40px; padding: 0 16px; border: 1px solid var(--filet); border-radius: var(--rayon);
+          background: var(--carte); color: var(--texte); font: 600 .95rem 'Source Sans 3', sans-serif; cursor: pointer; }
+.bouton:hover { border-color: var(--accent); }
+.bouton.principal { min-width: 7rem; background: var(--bouton); border-color: var(--bouton); color: var(--bouton-texte); }
+.bouton.principal:hover { filter: brightness(1.12); }
+.bouton.principal:disabled { opacity: .6; cursor: default; filter: none; }
+.bouton.discret { border-color: transparent; background: none; color: var(--discret); font-weight: 500; }
+.bouton.discret:hover { color: var(--accent); border-color: var(--filet); }
+.etat { margin-left: auto; font-size: .9rem; color: var(--discret); font-variant-numeric: tabular-nums; text-align: right; }
+
+/* ----- Result ----- */
+.vues { display: flex; border: 1px solid var(--filet); border-radius: var(--rayon); overflow: hidden; }
+.vues button { min-height: 34px; padding: 0 14px; border: 0; background: none; color: var(--discret);
+               font: 600 .9rem 'Source Sans 3', sans-serif; cursor: pointer; }
+.vues button[aria-selected="true"] { background: var(--accent-fond); color: var(--accent); }
+.vues button:disabled { opacity: .45; cursor: default; }
+.erreur { margin: 16px; padding: 12px 14px; border-radius: var(--rayon); background: var(--alerte-fond); color: var(--alerte);
+          font: .85rem/1.55 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+.table-defile { max-height: 30rem; overflow: auto; }
+.table-defile:empty::before { content: attr(data-vide); display: block; padding: 28px 16px; color: var(--discret); }
+table { width: 100%; border-collapse: collapse; font-size: .9rem; font-variant-numeric: tabular-nums; }
+thead th { position: sticky; top: 0; z-index: 1; padding: 8px 14px; background: var(--carte); text-align: left;
+           font: 600 .8rem/1.4 var(--mono); white-space: nowrap; box-shadow: inset 0 -1px 0 var(--filet); }
+tbody td { padding: 6px 14px; border-bottom: 1px solid var(--filet); white-space: nowrap; }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover td { background: var(--accent-fond); }
+th.num, td.num { text-align: right; }
+td.nul { color: var(--discret); font-style: italic; }
+.plus { padding: 10px 16px; border-top: 1px solid var(--filet); font-size: .9rem; color: var(--discret); }
+
+/* ----- Chart: one horizontal bar per row ----- */
+.graphique { padding: 16px; }
+.graphique-choix { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; font-size: .9rem; color: var(--discret); }
+.graphique-choix select { min-height: 36px; padding: 0 8px; border: 1px solid var(--filet); border-radius: 6px;
+                          background: var(--carte); color: var(--texte); font: .85rem var(--mono); }
+#barres { display: grid; grid-template-columns: minmax(6rem, max-content) minmax(0, 1fr) max-content; gap: 6px 12px;
+          align-items: center; font-size: .9rem; }
+#barres .b-nom { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 16rem; }
+#barres .b-piste { height: 14px; border-radius: 3px; background: var(--barre-fond); }
+#barres .b-piste i { display: block; height: 100%; min-width: 2px; border-radius: 3px; background: var(--barre); }
+#barres .b-val { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* ----- Footer ----- */
+.pied { padding: 20px 24px 28px; border-top: 1px solid var(--filet); color: var(--discret); font-size: .88rem; }
+.pied p { max-width: 80ch; margin: 0 auto 4px; text-align: center; }
+
+/* ----- Small screens: one column, the editor first ----- */
+@media (max-width: 900px) {
+    .tete { flex-wrap: wrap; gap: 4px 12px; padding: 10px 16px; }
+    .titres { order: 3; flex-basis: 100%; }
+    .reglages { margin-left: auto; }
+    main { padding: 16px; }
+    .console { grid-template-columns: minmax(0, 1fr); }
+    /* Questions, then the query and its result, then the starters and the
+       tables: the lists no longer push the result five screens down. */
+    .cote { display: contents; }
+    .cote > section:nth-child(1) { order: 1; }
+    .travail { order: 2; }
+    .cote > section:nth-child(2) { order: 3; }
+    .cote > section:nth-child(3) { order: 4; }
+    .zone { height: 15rem; }
+    .raccourci { display: none; }
+    .etat { flex-basis: 100%; margin-left: 0; text-align: left; }
+    #barres { grid-template-columns: minmax(5rem, 9rem) minmax(0, 1fr) max-content; }
+}
+@media (prefers-reduced-motion: reduce) { .jauge i { transition: none; } }

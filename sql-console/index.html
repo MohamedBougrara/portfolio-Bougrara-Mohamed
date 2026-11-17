@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The console runs a SQL engine (DuckDB, WebAssembly) in a worker: this
+         page allows exactly that, and nothing from another site. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
+    <title>SQL console · Road accidents in France, 2019-2024 · Mohamed Bougrara</title>
+    <meta name="description" content="Run SQL yourself on six years of French road accident data: a star schema of 745,158 persons, queried in your browser.">
+    <meta name="author" content="Mohamed Bougrara">
+    <meta name="robots" content="noai, noimageai">
+    <meta name="rights" content="&copy; Mohamed Bougrara. All rights reserved.">
+    <link rel="icon" href="../favicon.ico">
+    <link rel="stylesheet" href="console.css">
+</head>
+<body>
+<header class="tete">
+    <a class="retour" id="retour" href="../accidents-route.html"><span aria-hidden="true">&larr;</span> <span data-t="back">Case study</span></a>
+    <div class="titres">
+        <h1 data-t="title">SQL console</h1>
+        <p data-t="subtitle">Six years of road accidents in France, queried in your browser</p>
+    </div>
+    <div class="reglages">
+        <div class="langues" role="group" aria-label="Language">
+            <a href="?lang=en" id="lang-en" lang="en">EN</a>
+            <a href="?lang=fr" id="lang-fr" lang="fr">FR</a>
+        </div>
+        <button type="button" id="theme" class="bouton-icone" aria-label="Dark mode">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        </button>
+    </div>
+</header>
+
+<main>
+    <!-- 1. While the engine and the data load. -->
+    <section id="chargement" class="chargement" role="status" aria-live="polite">
+        <h2 data-t="loading_title">Opening the database</h2>
+        <p data-t="loading_text">The SQL engine and the data are downloaded once (about 13 MB), then every query runs on your device.</p>
+        <div class="jauge" aria-hidden="true"><i id="jauge"></i></div>
+        <p class="etape" id="etape"></p>
+    </section>
+
+    <section id="panne" class="panne" hidden>
+        <h2 data-t="error_title">The console could not start</h2>
+        <p id="panne-detail"></p>
+        <p><a id="panne-lien" href="../accidents-route.html" data-t="error_link">Read the results in the case study</a></p>
+    </section>
+
+    <!-- 2. The console. -->
+    <div id="console" class="console" hidden>
+        <aside class="cote" aria-label="Questions and tables">
+            <section aria-labelledby="t-questions">
+                <h2 id="t-questions" data-t="questions">The seven questions</h2>
+                <p class="aide" data-t="questions_help">One click loads my query and runs it. Then change it.</p>
+                <ol class="questions" id="questions"></ol>
+            </section>
+            <section aria-labelledby="t-essais">
+                <h2 id="t-essais" data-t="yours">Your turn</h2>
+                <ul class="essais" id="essais"></ul>
+            </section>
+            <section aria-labelledby="t-tables">
+                <h2 id="t-tables" data-t="tables">Tables</h2>
+                <p class="aide" data-t="tables_help">Open a table to see its columns. A click on a name writes it in the query.</p>
+                <div id="tables"></div>
+            </section>
+        </aside>
+
+        <div class="travail">
+            <section class="question-active" id="question-active" hidden aria-live="polite">
+                <p class="qa-titre" id="qa-titre"></p>
+                <p class="qa-constat" id="qa-constat"></p>
+            </section>
+
+            <section class="editeur" aria-labelledby="t-requete">
+                <div class="editeur-tete">
+                    <h2 id="t-requete" data-t="query">Query</h2>
+                    <span class="raccourci" data-t="shortcut">Ctrl + Enter to run</span>
+                </div>
+                <div class="zone">
+                    <pre id="reflet" aria-hidden="true"></pre>
+                    <textarea id="sql" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off" aria-labelledby="t-requete"></textarea>
+                </div>
+                <div class="barre">
+                    <button type="button" id="executer" class="bouton principal"><span data-t="run">Run</span></button>
+                    <button type="button" id="arreter" class="bouton" hidden><span data-t="stop">Stop</span></button>
+                    <button type="button" id="remettre" class="bouton discret"><span data-t="reset">Reset the database</span></button>
+                    <p class="etat" id="etat" role="status" aria-live="polite"></p>
+                </div>
+            </section>
+
+            <section class="resultat" aria-labelledby="t-resultat">
+                <div class="resultat-tete">
+                    <h2 id="t-resultat" data-t="result">Result</h2>
+                    <div class="vues" role="tablist" aria-labelledby="t-resultat">
+                        <button type="button" role="tab" id="vue-table" aria-selected="true" aria-controls="p-table" data-t="table">Table</button>
+                        <button type="button" role="tab" id="vue-graphique" aria-selected="false" aria-controls="p-graphique" data-t="chart">Chart</button>
+                    </div>
+                </div>
+                <p class="erreur" id="erreur" role="alert" hidden></p>
+                <div id="p-table" role="tabpanel" aria-labelledby="vue-table" class="table-defile" tabindex="0"></div>
+                <div id="p-graphique" role="tabpanel" aria-labelledby="vue-graphique" class="graphique" hidden>
+                    <p class="graphique-choix"><label for="mesure" data-t="measure">Measure</label> <select id="mesure"></select></p>
+                    <div id="barres"></div>
+                    <p class="aide" id="graphique-note"></p>
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+
+<footer class="pied">
+    <p data-t="foot_data">Data: French national road injury accident file (BAAC, ONISR), Open Licence, 2019-2024.</p>
+    <p data-t="foot_engine">I built the database in PostgreSQL 16. Here the same tables are read by DuckDB, a SQL engine that runs in the browser: my eight queries return the same results in both, checked at every publication.</p>
+    <p>&copy; 2026 Mohamed Bougrara</p>
+</footer>
+<script src="console.js"></script>
+</body>
+</html>
