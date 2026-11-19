@@ -80,9 +80,7 @@ body.etude-page { background: var(--e-bg, #fff); }
 .e-btn svg { width: 16px; height: 16px; flex: none; }
 .e-btn-2 { background: transparent; color: var(--e-ink) !important; border-color: var(--e-rule-2); }
 .e-btn-2:hover { background: var(--e-wash); }
-.e-lien { font-weight: 600; text-decoration: none !important; }
-.e-lien:hover { text-decoration: underline !important; }
-.e-lien::after { content: "\00a0\2192"; }
+/* .e-lien : bouton a cadre, regle commune dans styles.css. */
 .e-note { flex-basis: 100%; margin: 0; color: var(--e-ink-3); font-size: .875rem !important; line-height: 1.5 !important; }
 @media (max-width: 479px) {
     .e-actions > .e-btn { flex: 1 1 100%; }

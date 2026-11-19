@@ -1030,10 +1030,7 @@ button:focus-visible,
     }
 }
 .btn-primary::after,
-.hf-cta::after,
 .proof-link::after,
-.exp-applink::after,
-.exp-proof::after,
 .proj-live-hint::after {
     content: "\2192";
     margin-left: 0.35em;
@@ -1420,4 +1417,38 @@ main h1, main h2 {
     font-family: 'Source Serif 4', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
     font-weight: 600;
     letter-spacing: -0.012em;
+}
+.hf-cta, .hf-tous a, .exp-proof, .exp-applink, .e-lien {
+    display: inline-flex; align-items: center; gap: 10px;
+    min-height: 48px; padding: 8px 14px 8px 16px;
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--card-bg); color: var(--text);
+    font-size: var(--fs-sm); font-weight: 650; line-height: 1.3; text-align: left;
+    text-decoration: none !important; text-wrap: balance;
+    transition: border-color var(--transition), background var(--transition), color var(--transition);
+}
+.hf-cta::after, .hf-tous a::after, .exp-proof::after, .exp-applink::after, .e-lien::after {
+    content: "\2192"; flex: none; margin-left: auto; padding-left: 6px;
+    color: var(--accent-text); transition: transform var(--transition); speak: never;
+}
+.hf-cta:hover, .hf-tous a:hover, .exp-proof:hover, .exp-applink:hover, .e-lien:hover,
+.hf-cta:focus-visible, .hf-tous a:focus-visible, .exp-proof:focus-visible, .exp-applink:focus-visible, .e-lien:focus-visible {
+    border-color: var(--accent); background: var(--accent-glow); color: var(--accent-text);
+}
+.hf-cta:hover::after, .hf-tous a:hover::after, .exp-proof:hover::after, .exp-applink:hover::after, .e-lien:hover::after { transform: translateX(3px); }
+.exp-proof svg { color: var(--accent-text); }
+@media (prefers-reduced-motion: reduce) {
+    .hf-cta, .hf-tous a, .exp-proof, .exp-applink, .e-lien,
+    .hf-cta::after, .hf-tous a::after, .exp-proof::after, .exp-applink::after, .e-lien::after { transition: none; }
+}
+.foot-in { align-items: center; }
+.foot-phrase { max-width: 60ch; }
+.foot-actions { align-items: stretch; gap: 10px; min-width: 17rem; }
+.foot-cv { justify-content: center; margin-bottom: 0; }
+.foot-lien { justify-content: center; min-height: 48px; padding: 0 18px; border: 1px solid var(--veil-3);
+             border-radius: var(--radius-sm); font-size: var(--fs-sm); text-align: center; }
+.foot-lien:hover { border-color: var(--accent-chrome); background: var(--veil-1); }
+@media (max-width: 820px) {
+    .foot-in { align-items: stretch; }
+    .foot-actions { min-width: 0; }
 }
